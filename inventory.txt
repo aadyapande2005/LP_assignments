@@ -1,0 +1,156 @@
+public with sharing class ProductInventoryController {
+
+    // Object for form input
+    public Product_Inventory__c product { get; set; }
+
+    // List to display records
+    public List<Product_Inventory__c> productList { get; set; }
+
+    // Constructor
+    public ProductInventoryController() {
+        product = new Product_Inventory__c();
+        fetchProducts();
+    }
+
+    // Fetch all products
+    public void fetchProducts() {
+        productList = [
+            SELECT Id,
+                   Product_Name__c,
+                   Serial_No__c,
+                   Manufacture_Date__c,
+                   Expiry_Date__c
+            FROM Product_Inventory__c
+            ORDER BY CreatedDate DESC
+        ];
+    }
+
+    // Insert product
+    public void saveProduct() {
+
+        // Validation
+        if(product.Expiry_Date__c < product.Manufacture_Date__c) {
+            ApexPages.addMessage(
+                new ApexPages.Message(
+                    ApexPages.Severity.ERROR,
+                    'Expiry Date cannot be before Manufacture Date.'
+                )
+            );
+            return;
+        }
+
+        insert product;
+
+        ApexPages.addMessage(
+            new ApexPages.Message(
+                ApexPages.Severity.CONFIRM,
+                'Product added successfully.'
+            )
+        );
+
+        // Clear form
+        product = new Product_Inventory__c();
+
+        // Refresh list
+        fetchProducts();
+    }
+
+    // Delete product
+    public void deleteProduct() {
+
+        String productId =
+            ApexPages.currentPage().getParameters().get('pid');
+
+        Product_Inventory__c p =
+            [SELECT Id FROM Product_Inventory__c WHERE Id = :productId];
+
+        delete p;
+
+        ApexPages.addMessage(
+            new ApexPages.Message(
+                ApexPages.Severity.CONFIRM,
+                'Product deleted successfully.'
+            )
+        );
+
+        fetchProducts();
+    }
+}
+
+<apex:page controller="ProductInventoryController">
+
+    <apex:form>
+
+        <apex:pageBlock title="Product Inventory Management">
+
+            <apex:pageMessages />
+
+            <!-- Product Form -->
+            <apex:pageBlockSection columns="2">
+
+                <apex:inputText
+                    value="{!product.Product_Name__c}"
+                    label="Product Name"/>
+
+                <apex:inputText
+                    value="{!product.Serial_No__c}"
+                    label="Serial No"/>
+
+                <apex:inputField
+                    value="{!product.Manufacture_Date__c}"/>
+
+                <apex:inputField
+                    value="{!product.Expiry_Date__c}"/>
+
+            </apex:pageBlockSection>
+
+            <apex:commandButton
+                value="Save Product"
+                action="{!saveProduct}"
+                rerender="productTable,msg"/>
+
+        </apex:pageBlock>
+
+        <!-- Product List -->
+        <apex:pageBlock title="Available Products" id="productTable">
+
+            <apex:pageTable value="{!productList}" var="p">
+
+                <apex:column headerValue="Product Name">
+                    {!p.Product_Name__c}
+                </apex:column>
+
+                <apex:column headerValue="Serial No">
+                    {!p.Serial_No__c}
+                </apex:column>
+
+                <apex:column headerValue="Manufacture Date">
+                    {!p.Manufacture_Date__c}
+                </apex:column>
+
+                <apex:column headerValue="Expiry Date">
+                    {!p.Expiry_Date__c}
+                </apex:column>
+
+                <apex:column headerValue="Action">
+
+                    <apex:commandLink
+                        value="Delete"
+                        action="{!deleteProduct}"
+                        rerender="productTable">
+
+                        <apex:param
+                            name="pid"
+                            value="{!p.Id}" />
+
+                    </apex:commandLink>
+
+                </apex:column>
+
+            </apex:pageTable>
+
+        </apex:pageBlock>
+
+    </apex:form>
+
+</apex:page>

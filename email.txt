@@ -1,0 +1,133 @@
+public class EmailController {
+
+    public String toAddress {get; set;}
+    public String subject {get; set;}
+    public String body {get; set;}
+
+    public Blob fileBody {get; set;}
+    public String fileName {get; set;}
+
+    // Method to send email
+    public PageReference sendEmail() {
+
+        // Validate Email Address
+        if(toAddress == null || !Pattern.matches(
+            '^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$', 
+            toAddress)) {
+
+            ApexPages.addMessage(
+                new ApexPages.Message(
+                    ApexPages.Severity.ERROR,
+                    'Invalid Email Address!'
+                )
+            );
+
+            return null;
+        }
+
+        try {
+
+            // Create Email Object
+            Messaging.SingleEmailMessage mail =
+                new Messaging.SingleEmailMessage();
+
+            mail.setToAddresses(
+                new String[] {toAddress}
+            );
+
+            mail.setSubject(subject);
+            mail.setPlainTextBody(body);
+
+            // Optional Attachment
+            if(fileBody != null) {
+
+                Messaging.EmailFileAttachment attachment =
+                    new Messaging.EmailFileAttachment();
+
+                attachment.setFileName(fileName);
+                attachment.setBody(fileBody);
+
+                mail.setFileAttachments(
+                    new Messaging.EmailFileAttachment[]
+                    {attachment}
+                );
+            }
+
+            // Send Email
+            Messaging.sendEmail(
+                new Messaging.SingleEmailMessage[] {mail}
+            );
+
+            ApexPages.addMessage(
+                new ApexPages.Message(
+                    ApexPages.Severity.CONFIRM,
+                    'Email Sent Successfully!'
+                )
+            );
+
+        }
+        catch(Exception e) {
+
+            ApexPages.addMessage(
+                new ApexPages.Message(
+                    ApexPages.Severity.ERROR,
+                    'Error : ' + e.getMessage()
+                )
+            );
+        }
+
+        return null;
+    }
+
+    // File Upload Handling
+    public void uploadFile() {
+
+        if(ApexPages.currentPage().getParameters()
+            .containsKey('file')) {
+
+            fileName = ApexPages.currentPage()
+                .getParameters().get('file');
+        }
+    }
+}
+
+
+<apex:page controller="EmailController">
+
+    <apex:form enctype="multipart/form-data">
+
+        <apex:pageBlock title="Send Email Notification">
+
+            <apex:pageMessages />
+
+            <apex:pageBlockSection columns="1">
+
+                <apex:inputText value="{!toAddress}"
+                                label="Recipient Email"/>
+
+                <apex:inputText value="{!subject}"
+                                label="Subject"/>
+
+                <apex:inputTextarea value="{!body}"
+                                    label="Message Body"
+                                    rows="5"/>
+
+                <!-- Optional File Upload -->
+                <apex:inputFile value="{!fileBody}"
+                                filename="{!fileName}"
+                                label="Attachment"/>
+
+            </apex:pageBlockSection>
+
+            <apex:pageBlockButtons>
+
+                <apex:commandButton value="Send Email"
+                                    action="{!sendEmail}"/>
+
+            </apex:pageBlockButtons>
+
+        </apex:pageBlock>
+
+    </apex:form>
+
+</apex:page>

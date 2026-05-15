@@ -1,0 +1,118 @@
+public class EmployeeManagementSystem {
+
+    // Add Employee
+    public static void addEmployee(
+        Integer empId,
+        String empName,
+        String email,
+        Date birthDate,
+        String department
+    ) {
+
+        Employee__c emp = new Employee__c();
+
+        emp.Employee_ID__c = empId;
+        emp.Employee_Name__c = empName;
+        emp.Email__c = email;
+        emp.Birth_Date__c = birthDate;
+        emp.Department__c = department;
+
+        insert emp;
+
+        System.debug('Employee Added Successfully');
+    }
+
+    // View All Employees
+    public static void viewEmployees() {
+
+        List<Employee__c> empList = [
+            SELECT Id,
+                   Employee_ID__c,
+                   Employee_Name__c,
+                   Email__c,
+                   Birth_Date__c,
+                   Department__c
+            FROM Employee__c
+        ];
+
+        System.debug('===== Employee Records =====');
+
+        for(Employee__c emp : empList) {
+
+            System.debug(
+                'Emp ID: ' + emp.Employee_ID__c +
+                ' | Name: ' + emp.Employee_Name__c +
+                ' | Email: ' + emp.Email__c +
+                ' | Birth Date: ' + emp.Birth_Date__c +
+                ' | Department: ' + emp.Department__c
+            );
+        }
+    }
+
+    // Update Employee Department
+    public static void updateEmployee(Integer empId, String newDepartment) {
+
+        Employee__c emp = [
+            SELECT Id, Department__c
+            FROM Employee__c
+            WHERE Employee_ID__c = :empId
+            LIMIT 1
+        ];
+
+        emp.Department__c = newDepartment;
+
+        update emp;
+
+        System.debug('Employee Updated Successfully');
+    }
+
+    // Delete Employee
+    public static void deleteEmployee(Integer empId) {
+
+        Employee__c emp = [
+            SELECT Id
+            FROM Employee__c
+            WHERE Employee_ID__c = :empId
+            LIMIT 1
+        ];
+
+        delete emp;
+
+        System.debug('Employee Deleted Successfully');
+    }
+
+    // Menu Driven Method
+    public static void menu(Integer choice) {
+
+        if(choice == 1) {
+
+            addEmployee(
+                101,
+                'Rahul Sharma',
+                'rahul@gmail.com',
+                Date.newInstance(2002, 5, 10),
+                'IT'
+            );
+
+        }
+        else if(choice == 2) {
+
+            viewEmployees();
+
+        }
+        else if(choice == 3) {
+
+            updateEmployee(101, 'HR');
+
+        }
+        else if(choice == 4) {
+
+            deleteEmployee(101);
+
+        }
+        else {
+
+            System.debug('Invalid Choice');
+        }
+    }
+}
