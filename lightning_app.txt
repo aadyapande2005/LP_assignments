@@ -1,0 +1,212 @@
+Here’s a **clear, practical step-by-step guide** to implement this *College Management Lightning App with validations* in Salesforce 👇
+
+---
+
+# 🧩 1. Create a Salesforce Lightning App
+
+1. Go to **Setup → App Manager**
+2. Click **New Lightning App**
+3. Name it: `College Management App`
+4. Add navigation items:
+
+   * Students
+   * Faculty
+5. Save & Finish
+
+---
+
+# 🧑‍🎓 2. Create Student Object
+
+1. Go to **Setup → Object Manager → Create → Custom Object**
+2. Label: `Student`
+3. Enable:
+
+   * Reports
+   * Activities
+
+### ➕ Add Fields:
+
+| Field Name  | Type   |
+| ----------- | ------ |
+| Name        | Text   |
+| Roll Number | Number |
+| Email       | Email  |
+| Marks       | Number |
+
+---
+
+# ✅ 3. Add Validation Rules (Students)
+
+Go to **Object Manager → Student → Validation Rules**
+
+### ✔ Marks Validation
+
+```
+OR(Marks__c < 0, Marks__c > 100)
+```
+
+Error: *Marks must be between 0 and 100*
+
+---
+
+### ✔ Roll Number Validation
+
+```
+Roll_Number__c <= 0
+```
+
+Error: *Roll number must be greater than 0*
+
+---
+
+### ✔ Email Validation
+
+```
+NOT(CONTAINS(Email__c, "@"))
+```
+
+Error: *Email must contain @ symbol*
+
+---
+
+### ✔ Name Validation
+
+```
+ISBLANK(Name)
+```
+
+Error: *Student name cannot be blank*
+
+---
+
+# 👩‍🏫 4. Create Faculty Object
+
+1. Go to **Object Manager → Create → Custom Object**
+2. Label: `Faculty`
+
+### ➕ Add Fields:
+
+| Field Name   | Type     |
+| ------------ | -------- |
+| Name         | Text     |
+| Faculty ID   | Number   |
+| Salary       | Currency |
+| Department   | Picklist |
+| Joining Date | Date     |
+
+---
+
+# 🏫 5. Create Department Picklist
+
+While creating Department field:
+
+* Add values like:
+
+  * Computer
+  * IT
+  * Mechanical
+  * Civil
+
+---
+
+# ✅ 6. Add Validation Rules (Faculty)
+
+### ✔ Name Validation
+
+```
+LEN(Name) < 3
+```
+
+Error: *Name must contain at least 3 characters*
+
+---
+
+### ✔ Faculty ID Validation
+
+```
+Faculty_ID__c <= 0
+```
+
+Error: *Faculty ID must be greater than 0*
+
+👉 Also mark **Faculty ID as Unique** in field settings
+
+---
+
+### ✔ Salary Validation
+
+```
+OR(Salary__c < 10000, Salary__c > 500000)
+```
+
+Error: *Salary must be between 10,000 and 500,000*
+
+---
+
+### ✔ Department Validation
+
+```
+ISBLANK(TEXT(Department__c))
+```
+
+Error: *Department must be selected*
+
+---
+
+### ✔ Joining Date Validation
+
+```
+Joining_Date__c > TODAY()
+```
+
+Error: *Joining date cannot be in future*
+
+---
+
+# 📊 7. Create Tabs
+
+1. Go to **Setup → Tabs**
+2. Create tabs for:
+
+   * Student
+   * Faculty
+
+---
+
+# 📌 8. Add to App
+
+1. Go to **App Manager**
+2. Edit your app
+3. Add:
+
+   * Student tab
+   * Faculty tab
+
+---
+
+# 🧪 9. Test Your App
+
+Try inserting:
+
+* Invalid marks (like 150 ❌)
+* Empty name ❌
+* Future joining date ❌
+
+You should see validation errors working ✅
+
+---
+
+# 🚀 Optional (Bonus for Higher Marks)
+
+* Add **Record Types** for departments
+* Create **Reports & Dashboards**
+* Add **Flow (Automation)** for notifications
+* Customize UI using **Lightning App Builder**
+
+---
+
+If you want, I can also give:
+
+* Apex trigger version of validations
+* Step-by-step screenshots
+* Viva questions & answers for this assignment 🎯
